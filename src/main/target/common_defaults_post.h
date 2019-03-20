@@ -297,7 +297,6 @@
 #if defined(USE_MULTI_GYRO) && !defined(GYRO_2_SPI_INSTANCE)
 #define GYRO_2_SPI_INSTANCE     GYRO_1_SPI_INSTANCE
 #define GYRO_2_CS_PIN           NONE
-#define GYRO_2_ALIGN            ALIGN_DEFAULT
 #define GYRO_2_EXTI_PIN         NONE
 #endif
 
@@ -314,7 +313,11 @@
 #endif
 
 #if !defined(GYRO_1_ALIGN)
-#define GYRO_1_ALIGN            ALIGN_DEFAULT
+#define GYRO_1_ALIGN            CW0_DEG
+#endif
+
+#if !defined(GYRO_2_ALIGN)
+#define GYRO_2_ALIGN            CW0_DEG
 #endif
 
 #if defined(MPU_ADDRESS)

@@ -30,6 +30,7 @@ include $(ROOT)/make/targets_list.mk
 
 alignsensor_unittest_SRC := \
 		$(USER_DIR)/sensors/boardalignment.c \
+		$(USER_DIR)/common/sensor_alignment.c \
 		$(USER_DIR)/common/maths.c
 
 arming_prevention_unittest_SRC := \
@@ -237,6 +238,7 @@ sensor_gyro_unittest_SRC := \
 		$(USER_DIR)/sensors/boardalignment.c \
 		$(USER_DIR)/common/filter.c \
 		$(USER_DIR)/common/maths.c \
+		$(USER_DIR)/common/sensor_alignment.c \
 		$(USER_DIR)/drivers/accgyro/accgyro_fake.c \
 		$(USER_DIR)/drivers/accgyro/gyro_sync.c \
 		$(USER_DIR)/pg/pg.c \

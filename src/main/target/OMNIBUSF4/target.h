@@ -109,9 +109,7 @@
 // Dummy defines
 #define GYRO_2_SPI_INSTANCE     GYRO_1_SPI_INSTANCE
 #define GYRO_2_CS_PIN           NONE
-#define GYRO_2_ALIGN            ALIGN_DEFAULT
 #define GYRO_2_EXTI_PIN         NONE
-#define ACC_2_ALIGN             ALIGN_DEFAULT
 
 #define USE_MAG
 #define USE_MAG_HMC5883

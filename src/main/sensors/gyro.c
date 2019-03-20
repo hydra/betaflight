@@ -415,7 +415,9 @@ static bool gyroInitSensor(gyroSensor_t *gyroSensor, const gyroDeviceConfig_t *c
 {
     gyroSensor->gyroDebugAxis = gyroConfig()->gyro_filter_debug_axis;
     gyroSensor->gyroDev.gyro_high_fsr = gyroConfig()->gyro_high_fsr;
-    gyroSensor->gyroDev.gyroAlign = config->align;
+
+    buildRotationMatrixFromAlignment(&config->alignment, &gyroSensor->gyroDev.rotationMatrix);
+
     gyroSensor->gyroDev.mpuIntExtiTag = config->extiTag;
 
 #if defined(USE_GYRO_MPU6050) || defined(USE_GYRO_MPU3050) || defined(USE_GYRO_MPU6500) || defined(USE_GYRO_SPI_MPU6500) || defined(USE_GYRO_SPI_MPU6000) \
@@ -1029,7 +1031,7 @@ static FAST_CODE FAST_CODE_NOINLINE void gyroUpdateSensor(gyroSensor_t *gyroSens
         gyroSensor->gyroDev.gyroADC[Z] = gyroSensor->gyroDev.gyroADCRaw[Z] - gyroSensor->gyroDev.gyroZero[Z];
 #endif
 
-        alignSensors(gyroSensor->gyroDev.gyroADC, gyroSensor->gyroDev.gyroAlign);
+        alignSensor(gyroSensor->gyroDev.gyroADC, &gyroSensor->gyroDev.rotationMatrix);
     } else {
         performGyroCalibration(gyroSensor, gyroConfig()->gyroMovementCalibrationThreshold);
         // still calibrating, so no need to further process gyro data
