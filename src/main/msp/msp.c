@@ -1973,64 +1973,35 @@ static mspResult_e mspProcessInCommand(uint8_t cmdMSP, sbuf_t *src)
         resetPidProfile(currentPidProfile);
         break;
     case MSP_SET_SENSOR_ALIGNMENT: {
-        // maintain backwards compatibility for API < 1.41
-        legacy_sensor_align_e gyroRotation = sbufReadU8(src);
-
-        legacy_sensor_align_e accRotation = sbufReadU8(src);
-        UNUSED(accRotation);
-
-        legacy_sensor_align_e compassRotation = sbufReadU8(src);
-        updateStandardAlignmentFromNonDefaultLegacyRotation(&compassConfigMutable()->mag_alignment, compassRotation);
-
-        // API >= 1.41 - support the gyro_to_use and alignment for gyros 1 & 2
-        if (sbufBytesRemaining(src) >= 3) {
-            uint8_t gyro_to_use = sbufReadU8(src);
-            uint8_t accGyroCount = 1;
-
+        uint8_t accGyroCount = 1;
 #ifdef USE_MULTI_GYRO
-            accGyroCount = 2;
+        accGyroCount = 2;
+#endif
+
+        int expectedBytesRemaining =
+            1 + // gyro to use
+            (accGyroCount * sizeof(int16_t) * FLIGHT_DYNAMICS_INDEX_COUNT) +
+            (sizeof(int16_t) * FLIGHT_DYNAMICS_INDEX_COUNT);
+
+        uint8_t bytesRemaining = sbufBytesRemaining(src);
+
+        if (bytesRemaining == expectedBytesRemaining) {
+
+            uint8_t gyro_to_use = sbufReadU8(src);
+#ifdef USE_MULTI_GYRO
             gyroConfigMutable()->gyro_to_use = gyro_to_use;
 #else
             UNUSED(gyro_to_use);
 #endif
 
-            uint8_t bytesRemaining = sbufBytesRemaining(src);
-            if (bytesRemaining == 2) {
-                // API == 1.41 - standard legacy alignments for gyros 1 & 2
-
-                for (int gyroIndex = 0; gyroIndex < 2; gyroIndex++) {
-                    legacy_sensor_align_e rotation = sbufReadU8(src);
-                    if (gyroIndex < accGyroCount) {
-                        updateStandardAlignmentFromNonDefaultLegacyRotation(&gyroDeviceConfigMutable(gyroIndex)->alignment, rotation);
-                    }
-                }
-            } else {
-                // API >= 1.42 - arbitrary alignments
-                int expectedBytesRemaining =
-                    (accGyroCount * sizeof(uint16_t) * FLIGHT_DYNAMICS_INDEX_COUNT) +
-                    (sizeof(uint16_t) * FLIGHT_DYNAMICS_INDEX_COUNT);
-
-                if (bytesRemaining == expectedBytesRemaining) {
-                    for (int gyroIndex = 0; gyroIndex < accGyroCount; gyroIndex++) {
-                        for (int axisIndex = 0; axisIndex < FLIGHT_DYNAMICS_INDEX_COUNT; axisIndex++) {
-                            gyroDeviceConfigMutable(gyroIndex)->alignment.raw[axisIndex] = sbufReadU16(src);
-                        }
-                    }
-                    for (int axisIndex = 0; axisIndex < FLIGHT_DYNAMICS_INDEX_COUNT; axisIndex++) {
-                        compassConfigMutable()->mag_alignment.raw[axisIndex] = sbufReadU16(src);
-                    }
+            for (int gyroIndex = 0; gyroIndex < accGyroCount; gyroIndex++) {
+                for (int axisIndex = 0; axisIndex < FLIGHT_DYNAMICS_INDEX_COUNT; axisIndex++) {
+                    gyroDeviceConfigMutable(gyroIndex)->alignment.raw[axisIndex] = sbufReadU16(src);
                 }
             }
-        } else {
-            // maintain backwards compatibility for API < 1.41
-
-            gyroDeviceConfig_t* gyroDeviceConfig = gyroDeviceConfigMutable(0); // update GYRO 0 by default
-#ifdef USE_MULTI_GYRO
-            if (gyroConfig()->gyro_to_use == GYRO_CONFIG_USE_GYRO_2) {
-                gyroDeviceConfig = gyroDeviceConfigMutable(1);
+            for (int axisIndex = 0; axisIndex < FLIGHT_DYNAMICS_INDEX_COUNT; axisIndex++) {
+                compassConfigMutable()->mag_alignment.raw[axisIndex] = sbufReadU16(src);
             }
-#endif
-            updateStandardAlignmentFromNonDefaultLegacyRotation(&gyroDeviceConfig->alignment, gyroRotation);
         }
         break;
     }
