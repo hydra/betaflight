@@ -25,8 +25,8 @@
 #define BMP085_I2C_ADDR         0x77
 
 typedef struct bmp085Config_s {
-    ioTag_t xclrIO;
-    ioTag_t eocIO;
+    ioTag_t xclrTag;
+    ioTag_t eocTag;
 } bmp085Config_t;
 
 bool bmp085Detect(const bmp085Config_t *config, baroDev_t *baro);

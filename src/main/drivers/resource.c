@@ -56,7 +56,7 @@ const char * const ownerNames[OWNER_TOTAL_COUNT] = {
     "RX_SPI_CS",
     "SPI_CS",
     "GYRO_EXTI",
-    "BARO_EXTI",
+    "BARO_EOC",
     "COMPASS_EXTI",
     "USB",
     "USB_DETECT",
