@@ -82,6 +82,7 @@ typedef enum {
     OWNER_RX_SPI_CC2500_TX_EN,
     OWNER_RX_SPI_CC2500_LNA_EN,
     OWNER_RX_SPI_CC2500_ANT_SEL,
+    OWNER_BARO_XCLR,
     OWNER_TOTAL_COUNT
 } resourceOwner_e;
 

@@ -186,7 +186,7 @@ bool baroDetect(baroDev_t *dev, baroSensor_e baroHardwareToUse)
 #ifdef USE_BARO_BMP085
         {
             static bmp085Config_t defaultBMP085Config;
-            defaultBMP085Config.xclrTag = barometerConfig()->baro_spi_csn;
+            defaultBMP085Config.xclrTag = barometerConfig()->baro_xclr_tag;
             defaultBMP085Config.eocTag = barometerConfig()->baro_eoc_tag;
 
             static const bmp085Config_t *bmp085Config = &defaultBMP085Config;

@@ -39,16 +39,19 @@
 
 #ifdef USE_BARO
 
-static IO_t eocIO;
-
 static bool isConversionComplete = false;
 static bool isEOCConnected = false;
 
-void bmp085_extiHandler(extiCallbackRec_t* cb)
+#ifdef USE_EXTI
+static IO_t eocIO;
+static extiCallbackRec_t exti;
+
+static void bmp085_extiHandler(extiCallbackRec_t* cb)
 {
     UNUSED(cb);
     isConversionComplete = true;
 }
+#endif
 
 typedef struct {
     int16_t ac1;
@@ -126,23 +129,17 @@ static int32_t bmp085_get_temperature(uint32_t ut);
 static int32_t bmp085_get_pressure(uint32_t up);
 STATIC_UNIT_TESTED void bmp085_calculate(int32_t *pressure, int32_t *temperature);
 
+static bool bmp085TestEOCConnected(baroDev_t *baro, const bmp085Config_t *config);
+
 static IO_t xclrIO = IO_NONE;
 #define BMP085_OFF  IOLo(xclrIO);
 #define BMP085_ON   IOHi(xclrIO);
 
-static extiCallbackRec_t exti;
-
-void bmp085InitXclrIO(const bmp085Config_t *config)
+static void bmp085InitXclrIO(const bmp085Config_t *config)
 {
     xclrIO = IOGetByTag(config->xclrTag);
-    IOInit(xclrIO, OWNER_BARO_CS, 0);
+    IOInit(xclrIO, OWNER_BARO_XCLR, 0);
     IOConfigGPIO(xclrIO, IOCFG_OUT_PP);
-}
-
-void bmp085Disable(const bmp085Config_t *config)
-{
-    UNUSED(config);
-    BMP085_OFF;
 }
 
 bool bmp085Detect(const bmp085Config_t *config, baroDev_t *baro)
@@ -204,10 +201,12 @@ bool bmp085Detect(const bmp085Config_t *config, baroDev_t *baro)
         }
     }
 
+#ifdef USE_EXTI
     if (eocIO) {
         IORelease(eocIO);
         EXTIRelease(eocIO);
     }
+#endif
 
     BMP085_OFF;
 
@@ -355,10 +354,11 @@ static void bmp085_get_cal_param(busDevice_t *busdev)
     bmp085.cal_param.md = (data[20] << 8) | data[21];
 }
 
-bool bmp085TestEOCConnected(baroDev_t *baro, const bmp085Config_t *config)
+static bool bmp085TestEOCConnected(baroDev_t *baro, const bmp085Config_t *config)
 {
     UNUSED(config);
 
+#ifdef USE_EXTI
     if (!bmp085InitDone && eocIO) {
         // EOC should be low at this point. If not, assume EOC is not working
         if (IORead(eocIO)) {
@@ -374,6 +374,10 @@ bool bmp085TestEOCConnected(baroDev_t *baro, const bmp085Config_t *config)
             return true;
         }
     }
+#else
+    UNUSED(baro);
+#endif
+
     return false; // assume EOC is not connected
 }
 
