@@ -117,6 +117,8 @@ void pgResetFn_barometerConfig(barometerConfig_t *barometerConfig)
     barometerConfig->baro_spi_device = SPI_DEV_TO_CFG(SPIINVALID);
     barometerConfig->baro_spi_csn = IO_TAG_NONE;
 #endif
+
+    barometerConfig->baro_eoc_tag = IO_TAG(BARO_EOC_PIN);
 }
 
 #ifdef USE_BARO
@@ -183,15 +185,11 @@ bool baroDetect(baroDev_t *dev, baroSensor_e baroHardwareToUse)
     case BARO_BMP085:
 #ifdef USE_BARO_BMP085
         {
-            const bmp085Config_t *bmp085Config = NULL;
+            static bmp085Config_t defaultBMP085Config;
+            defaultBMP085Config.xclrTag = barometerConfig()->baro_spi_csn;
+            defaultBMP085Config.eocTag = barometerConfig()->baro_eoc_tag;
 
-#if defined(BARO_XCLR_PIN) && defined(BARO_EOC_PIN)
-            static const bmp085Config_t defaultBMP085Config = {
-                .xclrIO = IO_TAG(BARO_XCLR_PIN),
-                .eocIO = IO_TAG(BARO_EOC_PIN),
-            };
-            bmp085Config = &defaultBMP085Config;
-#endif
+            static const bmp085Config_t *bmp085Config = &defaultBMP085Config;
 
             if (bmp085Detect(bmp085Config, dev)) {
                 baroHardware = BARO_BMP085;
