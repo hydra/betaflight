@@ -47,3 +47,7 @@ const timerHardware_t timerHardware[USABLE_TIMER_CHANNEL_COUNT] = {
     DEF_TIM(TIM15, CH2, PA3,  TIM_USE_MOTOR,             0), // PWM8 - PA3
     DEF_TIM(TIM1,  CH1, PA8,  TIM_USE_LED,               0), // GPIO_TIMER / LED_STRIP
 };
+
+#ifndef EEPROM_IN_FLASH
+uint8_t eepromData[EEPROM_SIZE];
+#endif

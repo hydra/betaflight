@@ -132,6 +132,13 @@
 #if !defined(IRCSYNERGYF3)
 #define USE_FLASHFS
 #define USE_FLASH_M25P16
+
+#if defined(SPRACINGF3_EXFL)
+#define EEPROM_SIZE 3072
+#define EEPROM_IN_EXTERNAL_FLASH
+//#define USE_FLASH_W25N01G
+#endif
+
 #endif
 
 #define USE_UART1
