@@ -74,6 +74,7 @@
 #undef USE_OSD_OVER_MSP_DISPLAYPORT
 
 #undef USE_DMA
+#undef USE_DMA_SPEC
 #undef USE_ADC
 #undef USE_DSHOT
 #undef USE_GYRO_DATA_ANALYSE
