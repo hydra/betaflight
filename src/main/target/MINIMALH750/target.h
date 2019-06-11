@@ -25,6 +25,6 @@
 
 #include "target_shared.h"
 
-#ifdef EXST
+#ifdef USE_EXST
 #include "target_exst.h"
 #endif
