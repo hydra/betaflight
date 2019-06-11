@@ -26,7 +26,6 @@
 #include "platform.h"
 
 #ifdef USE_PWM_OUTPUT
-
 #include "drivers/time.h"
 
 #include "drivers/io.h"
@@ -429,11 +428,6 @@ pwmOutputPort_t *pwmGetMotors(void)
     return motors;
 }
 
-bool isMotorProtocolDshot(void)
-{
-    return isDshot;
-}
-
 #ifdef USE_DSHOT
 uint32_t getDshotHz(motorPwmProtocolTypes_e pwmProtocolType)
 {
@@ -779,4 +773,14 @@ void beeperPwmInit(const ioTag_t tag, uint16_t frequency)
     }
 }
 #endif // USE_BEEPER
+#endif //USE_PWM_OUTPUT
+
+bool isMotorProtocolDshot(void)
+{
+#if defined(USE_DSHOT)
+    return isDshot;
+#else
+    return false;
 #endif
+}
+
