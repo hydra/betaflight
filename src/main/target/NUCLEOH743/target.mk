@@ -1,6 +1,12 @@
-H743xI_TARGETS += $(TARGET)
+#H743xI_TARGETS += $(TARGET)
+H750xB_TARGETS += $(TARGET)
+
 #FEATURES       += SDCARD VCP
 FEATURES       += VCP ONBOARDFLASH
+
+EXST = yes
+
+FEATURE_CUT_LEVEL = 12
 
 # Top level Makefile adds, if not defined, HSE_VALUE, as default for F4 targets.
 # We don't want to assume any particular value until de facto design is established,

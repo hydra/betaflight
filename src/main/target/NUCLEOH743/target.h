@@ -41,6 +41,8 @@
 #define BEEPER_PIN              PE3
 #define BEEPER_INVERTED
 
+#define EEPROM_IN_RAM
+
 #define USE_UART
 
 #define USE_UART1
@@ -146,7 +148,7 @@
 #define HMC5883_SPI_INSTANCE    NULL
 #define HMC5883_CS_PIN          NONE
 
-#define USE_BARO
+//#define USE_BARO
 #define USE_BARO_BMP085
 #define USE_BARO_BMP280
 #define USE_BARO_MS5611
