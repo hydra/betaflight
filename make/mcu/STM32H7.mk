@@ -20,8 +20,6 @@ EXCLUDES        = \
                 stm32h7xx_hal_crc_ex.c \
                 stm32h7xx_hal_cryp.c \
                 stm32h7xx_hal_cryp_ex.c \
-                stm32h7xx_hal_dac.c \
-                stm32h7xx_hal_dac_ex.c \
                 stm32h7xx_hal_dcmi.c \
                 stm32h7xx_hal_dfsdm.c \
                 stm32h7xx_hal_dma2d.c \
@@ -52,7 +50,6 @@ EXCLUDES        = \
                 stm32h7xx_hal_rtc.c \
                 stm32h7xx_hal_sai.c \
                 stm32h7xx_hal_sai_ex.c \
-                stm32h7xx_hal_sd.c \
                 stm32h7xx_hal_sd_ex.c \
                 stm32h7xx_hal_sdram.c \
                 stm32h7xx_hal_smartcard.c \
