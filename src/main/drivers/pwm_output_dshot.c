@@ -46,6 +46,7 @@
 #include "drivers/dshot_dpwm.h"
 #include "drivers/dshot_command.h"
 
+#include "pwm_output_dshot_telemetry.h"
 #include "pwm_output_dshot_shared.h"
 
 #ifdef USE_DSHOT_TELEMETRY

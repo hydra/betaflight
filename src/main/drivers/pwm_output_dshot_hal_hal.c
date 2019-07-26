@@ -449,4 +449,36 @@ P    -    High -     High -
 
     motor->configured = true;
 }
-#endif
+
+#ifdef USE_DSHOT_TELEMETRY
+uint16_t getDshotTelemetry(uint8_t index)
+{
+    return dmaMotors[index].dshotTelemetryValue;
+}
+
+bool isDshotMotorTelemetryActive(uint8_t motorIndex)
+{
+    return dmaMotors[motorIndex].dshotTelemetryActive;
+}
+
+FAST_CODE_NOINLINE bool pwmStartDshotMotorUpdate(void)
+{
+#if 1 // XXX
+    // TODO implement for H7, just return true for now
+    return true;
+#else  // XXX
+
+
+    if (!useDshotTelemetry) {
+        return true;
+    }
+
+    // ...
+#endif // XXX
+}
+
+#endif // USE_DSHOT_TELEMETRY
+
+
+#endif // USE_DSHOT
+

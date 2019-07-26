@@ -66,6 +66,7 @@ uint8_t cliMode = 0;
 #include "drivers/dshot.h"
 #include "drivers/dshot_command.h"
 #include "drivers/dshot_dpwm.h"
+#include "drivers/pwm_output_dshot_telemetry.h"
 #include "drivers/camera_control.h"
 #include "drivers/compass/compass.h"
 #include "drivers/display.h"
@@ -263,7 +264,6 @@ static const char * const *sensorHardwareNames[] = {
 #endif // USE_SENSOR_NAMES
 
 #if defined(USE_DSHOT) && defined(USE_DSHOT_TELEMETRY)
-extern uint32_t readDoneCount;
 extern uint32_t inputBuffer[GCR_TELEMETRY_INPUT_LEN];
 extern uint32_t setDirectionMicros;
 #endif

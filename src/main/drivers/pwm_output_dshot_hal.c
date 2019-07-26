@@ -44,11 +44,7 @@
 
 #include "pwm_output.h"
 
-// TODO remove once debugging no longer needed
-#ifdef USE_DSHOT_TELEMETRY
-#include <string.h>
-#endif
-
+#include "pwm_output_dshot_telemetry.h"
 #include "pwm_output_dshot_shared.h"
 
 #ifdef USE_DSHOT_TELEMETRY
