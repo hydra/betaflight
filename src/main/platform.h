@@ -29,6 +29,9 @@
 #if defined(STM32H743xx) || defined(STM32H750xx)
 #include "stm32h7xx.h"
 #include "stm32h7xx_hal.h"
+#include "stm32h7xx_ll_dma.h"
+#include "stm32h7xx_ll_gpio.h"
+#include "stm32h7xx_ll_tim.h"
 #include "system_stm32h7xx.h"
 
 // Chip Unique ID on H7

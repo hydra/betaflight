@@ -71,11 +71,9 @@ EXCLUDES        = \
                 stm32h7xx_ll_crc.c \
                 stm32h7xx_ll_dac.c \
                 stm32h7xx_ll_delayblock.c \
-                stm32h7xx_ll_dma.c \
                 stm32h7xx_ll_dma2d.c \
                 stm32h7xx_ll_exti.c \
                 stm32h7xx_ll_fmc.c \
-                stm32h7xx_ll_gpio.c \
                 stm32h7xx_ll_hrtim.c \
                 stm32h7xx_ll_i2c.c \
                 stm32h7xx_ll_lptim.c \
@@ -88,7 +86,6 @@ EXCLUDES        = \
                 stm32h7xx_ll_rtc.c \
                 stm32h7xx_ll_spi.c \
                 stm32h7xx_ll_swpmi.c \
-                stm32h7xx_ll_tim.c \
                 stm32h7xx_ll_usart.c \
                 stm32h7xx_ll_utils.c
 
@@ -151,7 +148,7 @@ endif
 #Flags
 ARCH_FLAGS      = -mthumb -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-sp-d16 -fsingle-precision-constant -Wdouble-promotion
 
-DEVICE_FLAGS    = -DUSE_HAL_DRIVER -DUSE_DMA_RAM
+DEVICE_FLAGS    = -DUSE_HAL_DRIVER -DUSE_FULL_LL_DRIVER -DUSE_DMA_RAM
 
 #
 # H743xI : 2M FLASH, 1M RAM (H753xI also)
