@@ -1,6 +1,6 @@
 FEATURES    = VCP
 
-FEATURE_CUT_LEVEL = # don't use feature cut
+FEATURE_CUT_LEVEL = 99
 
 TARGET_SRC = \
             drivers/accgyro/accgyro_mpu.c \
