@@ -23,7 +23,11 @@
 #undef USE_DSHOT_DMAR           // OMNIBUS (F3) does not benefit from burst Dshot
 #undef USE_GYRO_OVERFLOW_CHECK
 
+#if defined(MCF3)
+#define TARGET_BOARD_IDENTIFIER "MCF3" // https://files.banggood.com/2016/12/Eachine%20MiniCube%20F3%206DOF%20integrate%20OSD%20Manual.pdf
+#else
 #define TARGET_BOARD_IDENTIFIER "OMNI" // https://en.wikipedia.org/wiki/Omnibus
+#endif
 
 #define LED0_PIN                PB3
 
@@ -46,12 +50,14 @@
 #define USE_ACC
 #define USE_ACC_SPI_MPU6000
 
+#if !defined(MCF3)
 #define BARO_SPI_INSTANCE       SPI1
 #define BARO_CS_PIN             PA13
 
 #define USE_BARO
 #define USE_BARO_BMP280
 #define USE_BARO_SPI_BMP280
+#endif
 
 //#define USE_RANGEFINDER
 //#define USE_RANGEFINDER_HCSR04
@@ -64,10 +70,14 @@
 #define USE_UART1
 #define USE_UART2
 #define USE_UART3
+#if defined(MCF3)
+#define SERIAL_PORT_COUNT       4
+#else
 #define USE_SOFTSERIAL1
 #define USE_SOFTSERIAL2
-
 #define SERIAL_PORT_COUNT       6
+#endif
+
 
 #define UART1_TX_PIN            PA9
 #define UART1_RX_PIN            PA10
@@ -78,11 +88,13 @@
 #define UART3_TX_PIN            PB10 // PB10 (PWM5)
 #define UART3_RX_PIN            PB11 // PB11 (PWM6)
 
+#if !defined(MCF3)
 #define USE_I2C
 #define USE_I2C_DEVICE_1
 #define I2C1_SCL                NONE // PB6 (PWM8)
 #define I2C1_SDA                NONE // PB7 (PWM7)
 #define I2C_DEVICE              (I2CDEV_1)
+#endif
 
 #define USE_ESCSERIAL
 #define ESCSERIAL_TIMER_TX_PIN  PB4  // (HARDARE=0,PPM)
@@ -114,12 +126,17 @@
 #define SPI2_MISO_PIN           PB14
 #define SPI2_MOSI_PIN           PB15
 
+#if !defined(MCF3)
 #define USE_SDCARD
 #define USE_SDCARD_SPI
 #define SDCARD_DETECT_INVERTED
 #define SDCARD_DETECT_PIN                   PC14
 #define SDCARD_SPI_INSTANCE                 SPI2
 #define SDCARD_SPI_CS_PIN                   SPI2_NSS_PIN
+
+#define ENABLE_BLACKBOX_LOGGING_ON_SDCARD_BY_DEFAULT
+#endif
+
 // DSHOT output 4 uses DMA1_Channel5, so don't use it for the SDCARD until we find an alternative
 
 #ifndef USE_DSHOT
@@ -139,12 +156,19 @@
 //#define RSSI_ADC_PIN                PB1
 //#define ADC_INSTANCE                ADC3
 
+#if !defined(MCF3)
 #define USE_TRANSPONDER
+#endif
+
 #define REDUCE_TRANSPONDER_CURRENT_DRAW_WHEN_USB_CABLE_PRESENT
 
-#define ENABLE_BLACKBOX_LOGGING_ON_SDCARD_BY_DEFAULT
 
+#if !defined(MCF3)
 #define DEFAULT_RX_FEATURE      FEATURE_RX_PPM
+#else
+#define DEFAULT_RX_FEATURE      FEATURE_RX_SERIAL
+#endif
+
 #define DEFAULT_FEATURES        (FEATURE_OSD)
 
 // Disable rarely used buttons in favor of flash space
@@ -161,3 +185,54 @@
 
 #define USABLE_TIMER_CHANNEL_COUNT 8 // PPM + 6 Outputs (2 shared with UART3)
 #define USED_TIMERS             (TIM_N(1) | TIM_N(2) | TIM_N(3) | TIM_N(4) | TIM_N(8) | TIM_N(15))
+
+#if defined(MCF3)
+#define USE_CMS
+//#define USE_ESC_SENSOR
+#define USE_GYRO_LPF2
+#define USE_DYN_LPF
+#define USE_D_MIN
+#define USE_THROTTLE_BOOST
+#define USE_INTEGRATED_YAW_CONTROL
+#define USE_ITERM_RELAX
+#define USE_RC_SMOOTHING_FILTER
+#define USE_THRUST_LINEARIZATION
+#define USE_TPA_MODE
+#define USE_OSD
+//#define USE_ABSOLUTE_CONTROL
+//#define USE_SERIAL_4WAY_SK_BOOTLOADER
+#define USE_SERIAL_4WAY_BLHELI_BOOTLOADER
+//#define USE_VTX_TABLE
+#define USE_BOARD_INFO
+#define USE_EXTENDED_CMS_MENUS
+//#define USE_RTC_TIME
+//#define USE_RX_MSP
+//#define USE_ESC_SENSOR_INFO
+//#define USE_RX_RSSI_DBM
+
+#define USE_DSHOT
+#define USE_DSHOT_TELEMETRY
+#define USE_DSHOT_TELEMETRY_STATS
+#define USE_RPM_FILTER
+#define USE_DYN_IDLE
+
+#undef USE_SERVOS
+#undef USE_SERIALRX_FPORT      // FrSky FPort
+#undef USE_PPM
+#undef USE_PWM
+#undef USE_BRUSHED_ESC_AUTODETECT
+#undef USE_SERIAL_PASSTHROUGH
+#undef USE_TASK_STATISTICS
+#undef USE_GYRO_REGISTER_DUMP
+
+#define USE_SERIAL_RX
+#undef USE_SERIALRX_CRSF       // Team Black Sheep Crossfire protocol
+#undef USE_SERIALRX_IBUS       // FlySky and Turnigy receivers
+//#define USE_SERIALRX_SBUS       // Frsky and Futaba receivers
+#undef USE_SERIALRX_SPEKTRUM   // SRXL, DSM2 and DSMX protocol
+#undef USE_SERIALRX_SUMD       // Graupner Hott protocol
+
+#undef USE_TELEMETRY_CRSF
+#undef USE_TELEMETRY_SRXL
+
+#endif
