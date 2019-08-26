@@ -210,6 +210,11 @@
 //#define USE_ESC_SENSOR_INFO
 //#define USE_RX_RSSI_DBM
 
+// These 3 only for debugging timers.
+#define USE_RESOURCE_MGMT
+#define USE_TIMER_MGMT
+#define USE_DMA_SPEC
+
 #define USE_DSHOT
 #define USE_DSHOT_TELEMETRY
 #define USE_DSHOT_TELEMETRY_STATS
