@@ -152,6 +152,7 @@
 #define VBAT_ADC_PIN                PA0
 #define CURRENT_METER_ADC_PIN       PA1
 #define ADC_INSTANCE                ADC1
+#define ADC1_DMA_OPT                0  // DMA 1 Channel 1
 
 //#define RSSI_ADC_PIN                PB1
 //#define ADC_INSTANCE                ADC3
