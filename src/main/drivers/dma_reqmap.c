@@ -292,7 +292,7 @@ static const dmaTimerMapping_t dmaTimerMapping[] = {
     // The embedded ADC24_DMA_REMAP conditional should be removed
     // when (and if) F3 is going generic.
 #define DMA(d, c) { DMA_CODE(d, 0, c), (dmaResource_t *)DMA ## d ## _Channel ## c }
-static const dmaPeripheralMapping_t dmaPeripheralMapping[17] = {
+static const dmaPeripheralMapping_t dmaPeripheralMapping[18] = {
 #ifdef USE_SPI
     { DMA_PERIPH_SPI_TX,  1, { DMA(1, 3) } },
     { DMA_PERIPH_SPI_RX,  1, { DMA(1, 2) } },
@@ -310,6 +310,11 @@ static const dmaPeripheralMapping_t dmaPeripheralMapping[17] = {
     { DMA_PERIPH_ADC,     2, { DMA(2, 1) } },
 #endif
     { DMA_PERIPH_ADC,     3, { DMA(2, 5) } },
+#ifdef ADC24_DMA_REMAP
+    { DMA_PERIPH_ADC,     4, { DMA(2, 4) } },
+#else
+    { DMA_PERIPH_ADC,     4, { DMA(2, 2) } },
+#endif
 #endif
 
 #ifdef USE_UART
