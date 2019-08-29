@@ -30,6 +30,11 @@
 #include "drivers/dma.h"
 #include "resource.h"
 
+DMA_HANDLER_CODE static void dmaNoOpHandler(struct dmaChannelDescriptor_s *channelDescriptor)
+{
+    UNUSED(channelDescriptor);
+}
+
 /*
  * DMA descriptors.
  */

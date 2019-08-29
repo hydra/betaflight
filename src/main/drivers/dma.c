@@ -29,6 +29,11 @@
 #include "drivers/nvic.h"
 #include "dma.h"
 
+DMA_HANDLER_CODE static void dmaNoOpHandler(struct dmaChannelDescriptor_s *channelDescriptor)
+{
+    UNUSED(channelDescriptor);
+}
+
 /*
  * DMA descriptors.
  */

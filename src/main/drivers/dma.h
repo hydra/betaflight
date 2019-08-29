@@ -39,6 +39,12 @@ typedef struct dmaResource_s dmaResource_t;
 #define DMA_ARCH_TYPE DMA_Channel_TypeDef
 #endif
 
+#if defined(USE_CCM_CODE) && defined(STM32F3)
+#define DMA_HANDLER_CODE CCM_CODE
+#else
+#define DMA_HANDLER_CODE
+#endif
+
 struct dmaChannelDescriptor_s;
 typedef void (*dmaCallbackHandlerFuncPtr)(struct dmaChannelDescriptor_s *channelDescriptor);
 
@@ -98,7 +104,7 @@ typedef enum {
     .dma = d, \
     .ref = (dmaResource_t *)d ## _Stream ## s, \
     .stream = s, \
-    .irqHandlerCallback = NULL, \
+    .irqHandlerCallback = dmaNoOpHandler, \
     .flagsShift = f, \
     .irqN = d ## _Stream ## s ## _IRQn, \
     .userParam = 0, \
@@ -106,11 +112,10 @@ typedef enum {
     .owner.resourceIndex = 0 \
     } 
 
-#define DEFINE_DMA_IRQ_HANDLER(d, s, i) void DMA ## d ## _Stream ## s ## _IRQHandler(void) {\
+#define DEFINE_DMA_IRQ_HANDLER(d, s, i) DMA_HANDLER_CODE void DMA ## d ## _Stream ## s ## _IRQHandler(void) {\
                                                                 const uint8_t index = DMA_IDENTIFIER_TO_INDEX(i); \
                                                                 dmaCallbackHandlerFuncPtr handler = dmaDescriptors[index].irqHandlerCallback; \
-                                                                if (handler) \
-                                                                    handler(&dmaDescriptors[index]); \
+                                                                handler(&dmaDescriptors[index]); \
                                                             }
 
 #define DMA_CLEAR_FLAG(d, flag) if (d->flagsShift > 31) d->dma->HIFCR = (flag << (d->flagsShift - 32)); else d->dma->LIFCR = (flag << d->flagsShift)
@@ -160,7 +165,7 @@ typedef enum {
 #define DEFINE_DMA_CHANNEL(d, c, f) { \
     .dma = d, \
     .ref = (dmaResource_t *)d ## _Channel ## c, \
-    .irqHandlerCallback = NULL, \
+    .irqHandlerCallback = dmaNoOpHandler, \
     .flagsShift = f, \
     .irqN = d ## _Channel ## c ## _IRQn, \
     .userParam = 0, \
@@ -168,17 +173,10 @@ typedef enum {
     .owner.resourceIndex = 0 \
     }
 
-#if defined(USE_CCM_CODE) && defined(STM32F3)
-#define DMA_HANDLER_CODE CCM_CODE
-#else
-#define DMA_HANDLER_CODE
-#endif
-
 #define DEFINE_DMA_IRQ_HANDLER(d, c, i) DMA_HANDLER_CODE void DMA ## d ## _Channel ## c ## _IRQHandler(void) {\
                                                                         const uint8_t index = DMA_IDENTIFIER_TO_INDEX(i); \
                                                                         dmaCallbackHandlerFuncPtr handler = dmaDescriptors[index].irqHandlerCallback; \
-                                                                        if (handler) \
-                                                                            handler(&dmaDescriptors[index]); \
+                                                                        handler(&dmaDescriptors[index]); \
                                                                     }
 
 #define DMA_CLEAR_FLAG(d, flag) d->dma->IFCR = (flag << d->flagsShift)
