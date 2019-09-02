@@ -31,11 +31,8 @@
 
 #include "flight/mixer.h"
 
-#ifdef STM32F7
-void MemManage_Handler(void)
+static void errorHandler_prepareForErrorState(void)
 {
-    LED2_ON;
-
     // fall out of the sky
     uint8_t requiredStateForMotors = SYSTEM_STATE_CONFIG_LOADED | SYSTEM_STATE_MOTORS_READY;
     if ((systemState & requiredStateForMotors) == requiredStateForMotors) {
@@ -49,6 +46,31 @@ void MemManage_Handler(void)
         transponderIrDisable();
     }
 #endif
+}
+
+void fatalErrorHandler(void)
+{
+    LED2_ON;
+
+    errorHandler_prepareForErrorState();
+
+    LED1_ON;
+    LED0_OFF;
+
+    while (1) {
+        delay(500);
+        LED2_TOGGLE;
+        delay(50);
+        LED2_TOGGLE;
+    }
+}
+
+#ifdef STM32F7
+void MemManage_Handler(void)
+{
+    LED2_ON;
+
+    errorHandler_prepareForErrorState();
 
     LED1_OFF;
     LED0_OFF;
@@ -129,19 +151,7 @@ void HardFault_Handler(void)
     LED1_ON;
     LED2_ON;
 
-    // fall out of the sky
-    uint8_t requiredStateForMotors = SYSTEM_STATE_CONFIG_LOADED | SYSTEM_STATE_MOTORS_READY;
-    if ((systemState & requiredStateForMotors) == requiredStateForMotors) {
-        stopMotors();
-    }
-
-#ifdef USE_TRANSPONDER
-    // prevent IR LEDs from burning out.
-    uint8_t requiredStateForTransponder = SYSTEM_STATE_CONFIG_LOADED | SYSTEM_STATE_TRANSPONDER_ENABLED;
-    if ((systemState & requiredStateForTransponder) == requiredStateForTransponder) {
-        transponderIrDisable();
-    }
-#endif
+    errorHandler_prepareForErrorState();
 
     LED0_OFF;
     LED1_OFF;
