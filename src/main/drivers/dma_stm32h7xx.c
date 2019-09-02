@@ -30,9 +30,13 @@
 #include "drivers/dma.h"
 #include "resource.h"
 
-DMA_HANDLER_CODE static void dmaNoOpHandler(struct dmaChannelDescriptor_s *channelDescriptor)
+void fatalErrorHandler(void);
+
+DMA_HANDLER_CODE static void dmaErrorConditionHandler(struct dmaChannelDescriptor_s *channelDescriptor)
 {
     UNUSED(channelDescriptor);
+
+    fatalErrorHandler(); // Invalid system state - DMA interrupt flags enabled without setting a handler, see `dmaSetHandler`.
 }
 
 /*

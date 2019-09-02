@@ -104,7 +104,7 @@ typedef enum {
     .dma = d, \
     .ref = (dmaResource_t *)d ## _Stream ## s, \
     .stream = s, \
-    .irqHandlerCallback = dmaNoOpHandler, \
+    .irqHandlerCallback = dmaErrorConditionHandler, \
     .flagsShift = f, \
     .irqN = d ## _Stream ## s ## _IRQn, \
     .userParam = 0, \
@@ -165,7 +165,7 @@ typedef enum {
 #define DEFINE_DMA_CHANNEL(d, c, f) { \
     .dma = d, \
     .ref = (dmaResource_t *)d ## _Channel ## c, \
-    .irqHandlerCallback = dmaNoOpHandler, \
+    .irqHandlerCallback = dmaErrorConditionHandler, \
     .flagsShift = f, \
     .irqN = d ## _Channel ## c ## _IRQn, \
     .userParam = 0, \
