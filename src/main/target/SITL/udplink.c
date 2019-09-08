@@ -6,6 +6,7 @@
  */
 
 #include <string.h>
+#include <sys/_types/_timeval.h>
 
 #include <fcntl.h>
 #include <sys/socket.h>
