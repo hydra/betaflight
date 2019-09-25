@@ -241,11 +241,6 @@ typedef struct {
     float motor_speed[4];   // normal: [0.0, 1.0], 3D: [-1.0, 1.0]
 } servo_packet;
 
-void FLASH_Unlock(void);
-void FLASH_Lock(void);
-FLASH_Status FLASH_ErasePage(uintptr_t Page_Address);
-FLASH_Status FLASH_ProgramWord(uintptr_t addr, uint32_t Data);
-
 uint64_t nanos64_real(void);
 uint64_t micros64_real(void);
 uint64_t millis64_real(void);

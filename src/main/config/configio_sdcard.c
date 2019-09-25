@@ -26,11 +26,27 @@
 
 #if defined(CONFIG_IN_SDCARD)
 
+#include "drivers/system.h"
+
 #include "build/build_config.h"
+#include "io/asyncfatfs/asyncfatfs.h"
 
 #include "configio.h"
 
+uint8_t eepromData[EEPROM_SIZE];
+
 configIO_t configIOSDCard;
+
+// XXX needed?
+#define CONFIG_STREAMER_BUFFER_SIZE 4
+typedef uint32_t config_streamer_buffer_align_type_t;
+
+typedef union {
+    uint8_t b[CONFIG_STREAMER_BUFFER_SIZE];
+    config_streamer_buffer_align_type_t w;
+} alignedBuffer_t;
+
+alignedBuffer_t alignedBuffer;
 
 enum {
     FILE_STATE_NONE = 0,
@@ -168,13 +184,93 @@ void configIOSDCardInit(void)
     }
 }
 
-void configIOSDCardRead(void)
+bool configIOSDCardRead(void)
 {
+	// copy it back from file to the in-memory buffer.
+	return loadEEPROMFromSDCard();
+}
+
+void configIOSDCardBeginWrite(configIO_t * const io, uintptr_t base, int size)
+{
+	io->err = 0;
+	io->at = 0;
+
+	io->address = base;
+	io->size = size;
+}
+
+// FIXME the return values are currently magic numbers
+static int write_word(configIO_t * const io, config_streamer_buffer_align_type_t *buffer)
+{
+    if (io->err != 0) {
+        return io->err;
+    }
+    if (io->address == (uintptr_t)&eepromData[0]) {
+        memset(eepromData, 0, sizeof(eepromData));
+    }
+
+    uint64_t *dest_addr = (uint64_t *)io->address;
+    uint64_t *src_addr = (uint64_t*)buffer;
+    uint8_t row_index = 4;
+    /* copy the 256 bits flash word */
+    do
+    {
+      *dest_addr++ = *src_addr++;
+    } while (--row_index != 0);
+    io->address += CONFIG_STREAMER_BUFFER_SIZE;
+    return 0;
+}
+
+
+int configIOSDCardAppendByte(configIO_t * const io, const uint8_t byte)
+{
+	alignedBuffer.b[io->at++] = byte;
+
+	if (io->at == sizeof(alignedBuffer)) {
+        io->err = write_word(io, &alignedBuffer.w);
+		io->at = 0;
+	}
+
+	return io->err;
+}
+
+
+int configIOSDCardFlush(configIO_t * const io)
+{
+    if (io->at != 0) {
+        memset(alignedBuffer.b + io->at, 0, sizeof(alignedBuffer) - io->at);
+		io->err = write_word(io, &alignedBuffer.w);
+        io->at = 0;
+    }
+
+    return io->err;
+}
+
+int configIOSDCardFinishWrite(configIO_t * const io)
+{
+	UNUSED(io);
+	return saveEEPROMToSDCard();
+}
+
+int configIOSDCardStatus(configIO_t * const io)
+{
+	return io->err;
+}
+
+size_t configIOSDCardGetStorageSize(void)
+{
+    return &__config_end - &__config_start;
 }
 
 static const configIOVTable_t configIOSDCardVTable = {
     .init = configIOSDCardInit,
     .read = configIOSDCardRead,
+	.appendByte = configIOSDCardAppendByte,
+	.flush = configIOSDCardFlush,
+	.status = configIOSDCardStatus,
+	.beginWrite = configIOSDCardBeginWrite,
+	.finishWrite = configIOSDCardFinishWrite,
+	.getStorageSize = configIOSDCardGetStorageSize,
 };
 
 configIO_t* configIOSDCardDetect(void)

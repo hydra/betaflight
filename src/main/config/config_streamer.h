@@ -23,33 +23,16 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "config/configio.h"
+
 // Streams data out to the EEPROM, padding to the write size as
 // needed, and updating the checksum as it goes.
 
-#ifdef CONFIG_IN_EXTERNAL_FLASH
-#define CONFIG_STREAMER_BUFFER_SIZE 8 // Must not be greater than the smallest flash page size of all compiled-in flash devices.
-typedef uint32_t config_streamer_buffer_align_type_t;
-#elif defined(STM32H7)
-#define CONFIG_STREAMER_BUFFER_SIZE 32  // Flash word = 256-bits
-typedef uint64_t config_streamer_buffer_align_type_t;
-#else
-#define CONFIG_STREAMER_BUFFER_SIZE 4
-typedef uint32_t config_streamer_buffer_align_type_t;
-#endif
-
 typedef struct config_streamer_s {
-    uintptr_t address;
-    int size;
-    union {
-        uint8_t b[CONFIG_STREAMER_BUFFER_SIZE];
-        config_streamer_buffer_align_type_t w;
-    } buffer;
-    int at;
-    int err;
-    bool unlocked;
+	configIO_t *io;
 } config_streamer_t;
 
-void config_streamer_init(config_streamer_t *c);
+void config_streamer_init(config_streamer_t *c, configIO_t *io);
 
 void config_streamer_start(config_streamer_t *c, uintptr_t base, int size);
 int config_streamer_write(config_streamer_t *c, const uint8_t *p, uint32_t size);

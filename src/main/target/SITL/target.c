@@ -19,13 +19,12 @@
  */
 
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 
-#include <errno.h>
 #include <time.h>
+#include <errno.h>
 
 #include "common/maths.h"
 
@@ -508,71 +507,6 @@ uint16_t adcGetChannel(uint8_t channel) {
 // stack part
 char _estack;
 char _Min_Stack_Size;
-
-// fake EEPROM
-static FILE *eepromFd = NULL;
-
-void FLASH_Unlock(void) {
-    if (eepromFd != NULL) {
-        fprintf(stderr, "[FLASH_Unlock] eepromFd != NULL\n");
-        return;
-    }
-
-    // open or create
-    eepromFd = fopen(EEPROM_FILENAME,"r+");
-    if (eepromFd != NULL) {
-        // obtain file size:
-        fseek(eepromFd , 0 , SEEK_END);
-        size_t lSize = ftell(eepromFd);
-        rewind(eepromFd);
-
-        size_t n = fread(eepromData, 1, sizeof(eepromData), eepromFd);
-        if (n == lSize) {
-            printf("[FLASH_Unlock] loaded '%s', size = %ld / %ld\n", EEPROM_FILENAME, lSize, sizeof(eepromData));
-        } else {
-            fprintf(stderr, "[FLASH_Unlock] failed to load '%s'\n", EEPROM_FILENAME);
-            return;
-        }
-    } else {
-        printf("[FLASH_Unlock] created '%s', size = %ld\n", EEPROM_FILENAME, sizeof(eepromData));
-        if ((eepromFd = fopen(EEPROM_FILENAME, "w+")) == NULL) {
-            fprintf(stderr, "[FLASH_Unlock] failed to create '%s'\n", EEPROM_FILENAME);
-            return;
-        }
-        if (fwrite(eepromData, sizeof(eepromData), 1, eepromFd) != 1) {
-            fprintf(stderr, "[FLASH_Unlock] write failed: %s\n", strerror(errno));
-        }
-    }
-}
-
-void FLASH_Lock(void) {
-    // flush & close
-    if (eepromFd != NULL) {
-        fseek(eepromFd, 0, SEEK_SET);
-        fwrite(eepromData, 1, sizeof(eepromData), eepromFd);
-        fclose(eepromFd);
-        eepromFd = NULL;
-        printf("[FLASH_Lock] saved '%s'\n", EEPROM_FILENAME);
-    } else {
-        fprintf(stderr, "[FLASH_Lock] eeprom is not unlocked\n");
-    }
-}
-
-FLASH_Status FLASH_ErasePage(uintptr_t Page_Address) {
-    UNUSED(Page_Address);
-//    printf("[FLASH_ErasePage]%x\n", Page_Address);
-    return FLASH_COMPLETE;
-}
-
-FLASH_Status FLASH_ProgramWord(uintptr_t addr, uint32_t value) {
-    if ((addr >= (uintptr_t)eepromData) && (addr < (uintptr_t)ARRAYEND(eepromData))) {
-        *((uint32_t*)addr) = value;
-        printf("[FLASH_ProgramWord]%p = %08x\n", (void*)addr, *((uint32_t*)addr));
-    } else {
-            printf("[FLASH_ProgramWord]%p out of range!\n", (void*)addr);
-    }
-    return FLASH_COMPLETE;
-}
 
 void uartPinConfigure(const serialPinConfig_t *pSerialPinConfig)
 {

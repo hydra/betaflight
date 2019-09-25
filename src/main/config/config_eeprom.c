@@ -35,12 +35,10 @@
 #include "config/configio_externalflash.h"
 #include "config/configio_file.h"
 #include "config/configio_flash.h"
+#include "config/configio_ram.h"
 #include "config/configio_sdcard.h"
 #include "pg/pg.h"
 #include "fc/config.h"
-#ifdef CONFIG_IN_SDCARD
-#include "io/asyncfatfs/asyncfatfs.h"
-#endif
 
 #include "drivers/flash.h"
 #include "drivers/system.h"
@@ -87,16 +85,6 @@ typedef struct {
     uint32_t word;
 } PG_PACKED packingTest_t;
 
-#if defined(CONFIG_IN_EXTERNAL_FLASH)
-#elif defined(CONFIG_IN_SDCARD)
-#endif
-
-#ifdef CONFIG_IN_FILE
-void loadEEPROMFromFile(void) {
-    FLASH_Unlock(); // load existing config file into eepromData
-}
-#endif
-
 configIO_t *configIO = NULL;
 
 void initEEPROM(void)
@@ -118,6 +106,8 @@ void initEEPROM(void)
     configIO = configIOSDCardDetect();
 #elif defined(CONFIG_IN_FLASH)
     configIO = configIOFlashDetect();
+#elif defined(CONFIG_IN_RAM)
+    configIO = configIORamDetect();
 #endif
 
     if (!configIO) {
@@ -194,10 +184,9 @@ uint16_t getEEPROMConfigSize(void)
 
 size_t getEEPROMStorageSize(void)
 {
+	configIO->vTable->getStorageSize();
 #if defined(CONFIG_IN_EXTERNAL_FLASH)
-
-    const flashPartition_t *flashPartition = flashPartitionFindByType(FLASH_PARTITION_TYPE_CONFIG);
-    return FLASH_PARTITION_SECTOR_COUNT(flashPartition) * flashGetGeometry()->sectorSize;
+// xxx moved
 #endif
 #ifdef CONFIG_IN_RAM
     return EEPROM_SIZE;
@@ -255,7 +244,7 @@ bool loadEEPROM(void)
 static bool writeSettingsToEEPROM(void)
 {
     config_streamer_t streamer;
-    config_streamer_init(&streamer);
+    config_streamer_init(&streamer, configIO);
 
     config_streamer_start(&streamer, (uintptr_t)&__config_start, &__config_end - &__config_start);
 
@@ -307,16 +296,7 @@ void writeConfigToEEPROM(void)
     // write it
     for (int attempt = 0; attempt < 3 && !success; attempt++) {
         if (writeSettingsToEEPROM()) {
-            success = true;
-
-#ifdef CONFIG_IN_EXTERNAL_FLASH
-            // copy it back from flash to the in-memory buffer.
-            success = loadEEPROMFromExternalFlash();
-#endif
-#ifdef CONFIG_IN_SDCARD
-            // copy it back from flash to the in-memory buffer.
-            success = loadEEPROMFromSDCard();
-#endif
+            success = configIO->vTable->read();
         }
     }
 

@@ -18,31 +18,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifdef CONFIG_IN_RAM
 
-struct configIO_s;
+#include "configio.h"
 
-typedef struct configIOVTable_s {
-	void (*init)(void);
-	bool (*read)(void);
+configIO_t* configIORamDetect(void);
 
-	size_t (*getStorageSize)(void);
-
-	// streamer
-	void (*beginWrite)(struct configIO_s * const io, uintptr_t base, int size);
-	int (*appendByte)(struct configIO_s * const io, const uint8_t byte);
-	int (*flush)(struct configIO_s * const io);
-	int (*status)(struct configIO_s * const io);
-	int (*finishWrite)(struct configIO_s * const io);
-} configIOVTable_t;
-
-typedef struct configIO_s {
-	const struct configIOVTable_s *vTable;
-
-	// streamer
-    int at;
-    int err;
-    uintptr_t address;
-    int size;
-
-} configIO_t;
+#endif
