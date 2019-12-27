@@ -53,9 +53,11 @@
 #define USE_GYRO
 // actual gyro is ICM20602 which is detected by the MPU6500 code
 #define USE_GYRO_SPI_MPU6500
+#define USE_GYRO_SPI_ICM42605
 
 #define USE_ACC
 #define USE_ACC_SPI_MPU6500
+#define USE_ACC_SPI_ICM42605
 
 #ifndef SPRACINGF4EVODG
 #define GYRO_1_ALIGN                CW0_DEG
