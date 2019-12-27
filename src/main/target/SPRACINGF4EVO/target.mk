@@ -1,7 +1,7 @@
 F405_TARGETS  += $(TARGET)
 FEATURES    = VCP SDCARD_SPI
 
-TARGET_SRC = \
+TARGET_SRC += \
             drivers/accgyro/accgyro_mpu6500.c \
             drivers/accgyro/accgyro_spi_mpu6500.c \
             drivers/barometer/barometer_bmp280.c \
