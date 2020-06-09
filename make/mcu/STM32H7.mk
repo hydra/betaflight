@@ -166,7 +166,7 @@ DEVICE_FLAGS       += -DMAX_MPU_REGIONS=16
 
 ifeq ($(RAM_BASED),yes)
 FIRMWARE_SIZE      := 448
-# TARGET_FLASH now becomes the amount of RAM memory that is occupied by the firmware
+# MCU_FLASH_SIZE now becomes the amount of RAM memory that is occupied by the firmware
 # and the maximum size of the data stored on the external storage device.
 MCU_FLASH_SIZE     := FIRMWARE_SIZE
 DEFAULT_LD_SCRIPT   = $(LINKER_DIR)/stm32_flash_h743_ram_based.ld
@@ -176,10 +176,10 @@ else ifeq ($(TARGET),$(filter $(TARGET),$(H750xB_TARGETS)))
 DEVICE_FLAGS       += -DSTM32H750xx
 DEFAULT_LD_SCRIPT   = $(LINKER_DIR)/stm32_flash_h750_128k.ld
 STARTUP_SRC         = startup_stm32h743xx.s
-DEFAULT_TARGET_FLASH := 128
+DEFAULT_MCU_FLASH_SIZE := 128
 
-ifeq ($(TARGET_FLASH),)
-MCU_FLASH_SIZE := $(DEFAULT_TARGET_FLASH) 
+ifeq ($(MCU_FLASH_SIZE),)
+MCU_FLASH_SIZE := $(DEFAULT_MCU_FLASH_SIZE) 
 endif
 
 ifeq ($(EXST),yes)
