@@ -78,8 +78,8 @@ typedef enum {
 
 typedef struct adcOperatingConfig_s {
     ioTag_t tag;
-#if defined(STM32H7) || defined(STM32G4)
     ADCDevice adcDevice;        // ADCDEV_x for this input
+#if defined(STM32H7) || defined(STM32G4)
     uint32_t adcChannel;        // Channel number for this input. Note that H7 and G4 HAL requires this to be 32-bit encoded number.
 #else
     uint8_t adcChannel;         // ADCy_INxx channel number for this input (XXX May be consolidated with uint32_t case)

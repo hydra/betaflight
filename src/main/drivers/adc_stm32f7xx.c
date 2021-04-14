@@ -211,31 +211,27 @@ void adcInit(const adcConfig_t *config)
 
     if (config->vbat.enabled) {
         adcOperatingConfig[ADC_BATTERY].tag = config->vbat.ioTag;
+        adcOperatingConfig[ADC_BATTERY].adcDevice = config->vbat.device;
     }
 
     if (config->rssi.enabled) {
         adcOperatingConfig[ADC_RSSI].tag = config->rssi.ioTag;  //RSSI_ADC_CHANNEL;
+        adcOperatingConfig[ADC_RSSI].adcDevice = config->rssi.device;
     }
 
     if (config->external1.enabled) {
         adcOperatingConfig[ADC_EXTERNAL1].tag = config->external1.ioTag; //EXTERNAL1_ADC_CHANNEL;
+        adcOperatingConfig[ADC_EXTERNAL1].adcDevice = config->external1.device;
     }
 
     if (config->current.enabled) {
         adcOperatingConfig[ADC_CURRENT].tag = config->current.ioTag;  //CURRENT_METER_ADC_CHANNEL;
+        adcOperatingConfig[ADC_CURRENT].adcDevice = config->current.device;
     }
-
-    ADCDevice device = ADC_CFG_TO_DEV(config->device);
-
-    if (device == ADCINVALID) {
-        return;
-    }
-
-    adc = adcHardware[device];
 
     bool adcActive = false;
     for (int i = 0; i < ADC_CHANNEL_COUNT; i++) {
-        if (adcVerifyPin(adcOperatingConfig[i].tag, device)) {
+        if (adcVerifyPin(adcOperatingConfig[i].tag, adcOperatingConfig[i].adcDevice)) {
             adcActive = true;
             IOInit(IOGetByTag(adcOperatingConfig[i].tag), OWNER_ADC_BATT + i, 0);
             IOConfigGPIO(IOGetByTag(adcOperatingConfig[i].tag), IO_CONFIG(GPIO_MODE_ANALOG, 0, GPIO_NOPULL));
@@ -258,7 +254,7 @@ void adcInit(const adcConfig_t *config)
 
 #ifdef USE_ADC_INTERNAL
     // If device is not ADC1 or there's no active channel, then initialize ADC1  here.
-    if (device != ADCDEV_1 || !adcActive) {
+    if (!adcActive) {
         adcInternal = adcHardware[ADCDEV_1];
         RCC_ClockCmd(adcInternal.rccADC, ENABLE);
         adcInitDevice(&adcInternal, 0);
@@ -278,28 +274,29 @@ void adcInit(const adcConfig_t *config)
             sConfig.SamplingTime = adcOperatingConfig[i].sampleTime;
             sConfig.Offset       = 0;
 
+#ifdef USE_DMA_SPEC
+            ADCDevice device = ADC_CFG_TO_DEV(adcOperatingConfig[i].adcDevice);
+            const dmaChannelSpec_t *dmaspec = dmaGetChannelSpecByPeripheral(DMA_PERIPH_ADC, device, config->dmaopt[device]);
+
+            if (!dmaspec) {
+                return;
+            }
+
+            dmaInit(dmaGetIdentifier(dmaspec->ref), OWNER_ADC, 0);
+            adc.DmaHandle.Init.Channel = dmaspec->channel;
+            adc.DmaHandle.Instance = (DMA_ARCH_TYPE *)dmaspec->ref;
+#else
+            dmaInit(dmaGetIdentifier(adc.dmaResource), OWNER_ADC, 0);
+            adc.DmaHandle.Init.Channel = adc.channel;
+            adc.DmaHandle.Instance = (DMA_ARCH_TYPE *)adc.dmaResource;
+#endif
+
             if (HAL_ADC_ConfigChannel(&adc.ADCHandle, &sConfig) != HAL_OK)
             {
                 /* Channel Configuration Error */
             }
         }
     }
-
-#ifdef USE_DMA_SPEC
-    const dmaChannelSpec_t *dmaspec = dmaGetChannelSpecByPeripheral(DMA_PERIPH_ADC, device, config->dmaopt[device]);
-
-    if (!dmaspec) {
-        return;
-    }
-
-    dmaInit(dmaGetIdentifier(dmaspec->ref), OWNER_ADC, 0);
-    adc.DmaHandle.Init.Channel = dmaspec->channel;
-    adc.DmaHandle.Instance = (DMA_ARCH_TYPE *)dmaspec->ref;
-#else
-    dmaInit(dmaGetIdentifier(adc.dmaResource), OWNER_ADC, 0);
-    adc.DmaHandle.Init.Channel = adc.channel;
-    adc.DmaHandle.Instance = (DMA_ARCH_TYPE *)adc.dmaResource;
-#endif
 
     adc.DmaHandle.Init.Direction = DMA_PERIPH_TO_MEMORY;
     adc.DmaHandle.Init.PeriphInc = DMA_PINC_DISABLE;
